@@ -17,9 +17,9 @@ def get_args():
     # Training settings
     parser = argparse.ArgumentParser(description='Semantic Human Matting !')
     parser.add_argument('--dataDir', default='./data/', help='dataset directory')
-    parser.add_argument('--fgLists', type=list, default=[], required=True, help="training fore-ground images lists")
+    parser.add_argument('--fgLists', type=list, default=['fg_list.txt'], help="training fore-ground images lists")
     parser.add_argument('--bg_list', type=str, required=True, help='train back-ground images list, one file')
-    parser.add_argument('--dataRatio', type=list, default=[], required=True, help="train bg:fg raio, eg. [100]")
+    parser.add_argument('--dataRatio', type=list, default=[10], help="train bg:fg raio, eg. [100]")
     parser.add_argument('--saveDir', default='./ckpt', help='model save dir')
     parser.add_argument('--trainData', default='human_matting_data', help='train dataset name')
 
