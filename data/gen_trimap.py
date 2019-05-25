@@ -37,13 +37,13 @@ def erode_dilate(msk, size=(10, 10), smooth=True):
     res = dilated.copy()
     res[((dilated == 255) & (eroded == 0))] = 128
 
-    """# make sure there are only 3 values in trimap
+    # make sure there are only 3 values in trimap
     cnt0 = len(np.where(res >= 0)[0])
     cnt1 = len(np.where(res == 0)[0])
     cnt2 = len(np.where(res == 128)[0])
     cnt3 = len(np.where(res == 255)[0])
     assert cnt0 == cnt1 + cnt2 + cnt3
-    """
+    
 
     return res
 
