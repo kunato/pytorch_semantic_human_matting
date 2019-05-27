@@ -28,7 +28,7 @@ def get_args():
     parser.add_argument('--without_gpu', action='store_true', default=False, help='no use gpu')
 
     parser.add_argument('--nThreads', type=int, default=4, help='number of threads for data loading')
-    parser.add_argument('--train_batch', type=int, default=8, help='input batch size for train')
+    parser.add_argument('--train_batch', type=int, default=10, help='input batch size for train')
     parser.add_argument('--patch_size', type=int, default=400, help='patch size for train')
 
     parser.add_argument('--lr', type=float, default=1e-5, help='learning rate')

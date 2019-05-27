@@ -177,9 +177,11 @@ def safe_crop(img, x, y, crop_size, resize_patch=None):
 
 # crop image around trimap unknown area with random size of [patch_size, 2*patch_size] then resize to patch_size
 def mask_center_crop(fg, a, bg, trimap, patch_size):
+    fh, fw = fg.shape[:2]
     max_size = patch_size * 2
     min_size = patch_size
     crop_size = random.randint(min_size, max_size)  # both value are inclusive
+    bg = resize_bg(bg, fh, fw)
 
     # get crop center around trimap unknown area
     y_idx, x_idx = np.where(trimap == 128)
@@ -189,7 +191,7 @@ def mask_center_crop(fg, a, bg, trimap, patch_size):
         cx = x_idx[idx]
         cy = y_idx[idx]
         x = max(0, cx - int(crop_size / 2))
-        y = max(0, cy - int(crop_size /2 ))
+        y = max(0, cy - int(crop_size / 2))
     else:
         raise ValueError('no unknown area in trimap!')
 
