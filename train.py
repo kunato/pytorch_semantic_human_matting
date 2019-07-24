@@ -11,6 +11,11 @@ import numpy as np
 from data import dataset
 from model import network
 import torch.nn.functional as F
+try:
+    from apex import amp
+    APEX_AVAILABLE = True
+except ModuleNotFoundError:
+    APEX_AVAILABLE = False
 
 
 def get_args():
@@ -26,7 +31,6 @@ def get_args():
     parser.add_argument('--bg_list',
                         type=str,
                         default='bg_list.txt',
-                        required=True,
                         help='train back-ground images list, one file')
     parser.add_argument('--dataRatio',
                         type=list,
@@ -51,11 +55,11 @@ def get_args():
 
     parser.add_argument('--nThreads',
                         type=int,
-                        default=4,
+                        default=5,
                         help='number of threads for data loading')
     parser.add_argument('--train_batch',
                         type=int,
-                        default=8,
+                        default=5,
                         help='input batch size for train')
     parser.add_argument('--patch_size',
                         type=int,
@@ -71,7 +75,7 @@ def get_args():
                         help='number of epochs to train')
     parser.add_argument('--save_epoch',
                         type=int,
-                        default=5,
+                        default=1,
                         help='number of epochs to save model')
     parser.add_argument('--print_iter',
                         type=int,
@@ -363,6 +367,16 @@ def main():
     if args.continue_train:
         start_epoch, model = trainlog.load_model(model)
 
+    if APEX_AVAILABLE:
+        print("Using APEX, Mixed Precision training")
+        model, optimizer = amp.initialize(model,
+                                          optimizer,
+                                          opt_level="O2",
+                                          keep_batchnorm_fp32=True,
+                                          loss_scale="dynamic")
+    else:
+        print("Start FP32 training")
+
     model.train()
     for epoch in range(start_epoch, args.nEpochs + 1):
 
@@ -460,7 +474,12 @@ def main():
                 L_composition_ += L_composition.item()
                 L_cross_ += L_cross.item()
 
-            loss.backward()
+            # loss.backward()
+            if APEX_AVAILABLE:
+                with amp.scale_loss(loss, optimizer) as scaled_loss:
+                    scaled_loss.backward()
+            else:
+                loss.backward()
             optimizer.step()
 
         # shuffle data after each epoch to recreate the dataset
